@@ -1,0 +1,23 @@
+<div>
+    <p id="time"></p>
+    <label for="msg">Message:</label>
+    <input type="text" id="msg">
+    <hr>
+    <div>
+        <button type="button" onclick="clickMe1()">click me (1.js)</button>
+        <button disabled type="button" onclick="clickMe2()">click me (2.js)</button>
+        <button disabled type="button" onclick="clickMe3()">click me (3.tsx)</button>
+        <button disabled type="button" onclick="console.log(func4(msg.value))">click me (4.ts)</button>
+        <button type="button" onclick="console.log(modfunc1(msg.value))">click me (m1.ts) Module</button>
+    </div>
+    <div id="hist"></div>
+</div>
+
+<script src="1.js"></script>
+<script type="module" src="m1.ts"></script>
+
+<script>
+    const p = document.querySelector('#time');
+    if (p)
+        p.innerHTML = new Date().toLocaleString();
+</script>

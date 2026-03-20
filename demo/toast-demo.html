@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toast Example</title>
+    <link rel="stylesheet" href="../public/toast.css">
+</head>
+<body>
+    <h1>Toast Notification Demo</h1>
+    <p>Click buttons to test different notification types. Hover over messages to pause auto-close.</p>
+
+    <div class="controls">
+        <h3>Default Settings</h3>
+        <label>
+            Duration: <input type="number" id="defaultDuration" value="3000" step="500" min="0"> ms
+            <small>(0 = no auto-close)</small>
+        </label>
+        <button onclick="applyDefaults()">Apply Defaults</button>
+
+        <h3>Send Messages</h3>
+        <button onclick="toast.success('Operation completed successfully!')">Success</button>
+        <button onclick="toast.error('An error occurred, please try again')">Error</button>
+        <button onclick="toast.warning('Warning: Data may be expired')">Warning</button>
+        <button onclick="toast.info('This is a normal message')">Info</button>
+        <button onclick="showMultiple()">Show Multiple</button>
+        <button onclick="showLongMessage()">Long Message Test</button>
+    </div>
+
+    <script src="../public/toast.js"></script>
+    <script>
+        function applyDefaults() {
+            var duration = parseInt(document.getElementById('defaultDuration').value) || 3000;
+            setToastDefaults({ duration: duration });
+            toast.info('Default duration set to ' + duration + 'ms');
+        }
+
+        function showMultiple() {
+            toast.success('First message');
+            setTimeout(function() {
+                toast.info('Second message');
+            }, 200);
+            setTimeout(function() {
+                toast.warning('Third message');
+            }, 400);
+        }
+
+        function showLongMessage() {
+            toast.info('This is a long message to test the hover-pause functionality. Hover over this message to see the timer pause, and it will resume after you move the mouse away.', { duration: 5000 });
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+        }
+        .controls {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .controls h3 {
+            margin-top: 0;
+        }
+        .controls label {
+            display: block;
+            margin: 10px 0;
+        }
+        .controls input {
+            width: 80px;
+            padding: 5px;
+        }
+        .controls button {
+            margin: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</body>
+</html>

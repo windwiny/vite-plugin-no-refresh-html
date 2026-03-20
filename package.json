@@ -1,0 +1,47 @@
+{
+  "name": "vite-plugin-nomodulejs-change-norefresh-html",
+  "version": "1.0.0-rc.1",
+  "description": "Vite plugin for handling nomodule js change not reload html use hmr",
+  "type": "module",
+  "main": "vite-plugin-ncnh.js",
+  "exports": {
+    ".": {
+      "import": "./vite-plugin-ncnh.js",
+      "require": "./vite-plugin-ncnh.js"
+    }
+  },
+  "files": [
+    "vite-plugin-ncnh.js",
+    "public/toast.js",
+    "public/toast.css",
+    "README.md",
+    "README_zh.md"
+  ],
+  "scripts": {
+    "prepublishOnly": "npm run test",
+    "lint": "eslint . --ext .js,.mjs",
+    "test": "node --test",
+    "version:patch": "npm version patch",
+    "version:minor": "npm version minor",
+    "version:major": "npm version major",
+    "publish:latest": "npm publish --access public",
+    "publish:next": "npm publish --tag next --access public"
+  },
+  "keywords": [
+    "vite",
+    "vite-plugin",
+    "script nomodule",
+    "hmr update nomodule js",
+    "keep html inputs value"
+  ],
+  "author": "windwiny",
+  "license": "ISC",
+  "peerDependencies": {
+    "vite": "^8.0.1"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  }
+}

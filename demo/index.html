@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vite-plugin-ncnh Demo</title>
+    <!-- Classic script tags (non-module) - for testing hot update -->
+    <script src="./1.js"></script>
+    <script src="./2.js?ver=11"></script>
+    <script src="./3.tsx?ver=11"></script>
+    <script src="./4.ts"></script>
+    <script src="./m1.ts?ver=11" type=module></script>
+
+    <style>
+        input,
+        textarea {
+            margin: 10px;
+            background-color: lightgoldenrodyellow;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>vite-plugin-ncnh Demo</h1>
+    <p>Modify any JS/TS file, the page won't refresh but code will hot-update</p>
+
+    <input type="text">
+    <textarea name="" id="msg" rows="4"></textarea>
+
+    <div>
+        <button type="button" onclick="clickMe1()">click me (1.js)</button>
+        <button type="button" onclick="clickMe2()">click me (2.js)</button>
+        <button type="button" onclick="clickMe3()">click me (3.tsx)</button>
+        <button type="button" onclick="console.log(func4(msg.value))">click me (4.ts)</button>
+        <button type="button" onclick="console.log(modfunc1(msg.value))">click me (m1.ts) Module</button>
+    </div>
+
+    <div>
+        <h2>iframe 2.html</h2>
+        <iframe src="./2.html" width="80%" height="300px" style="background-color: #ffcece;"></iframe>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log(`DOMContentLoaded`);
+            if (window.toast) {
+                toast.setToastDefaults?.({ duration: 5000 })
+                toast.info('Demo page loaded, form values will not be reset!')
+            }
+
+        })
+    </script>
+</body>
+
+</html>
