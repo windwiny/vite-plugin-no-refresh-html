@@ -171,7 +171,6 @@ if (import.meta.hot) {
  * Create static file serving middleware (with ETag caching)
  * @param {string} dir - Directory to serve files from
  * @param {string} urlPrefix - URL prefix for matching requests
- * @returns {import('connect').NextHandleFunction}
  */
 function createAssetMiddleware(dir, urlPrefix) {
     const generateETag = (stats) => {
