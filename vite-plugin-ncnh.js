@@ -57,7 +57,9 @@ export function vitePluginNCNH(options = {}) {
                 <script src="${otherPath}toast.js" vite=ignore></script>`;
             }
             if (onHotUpdate) {
-                result += `<script vite=ignore>var _vite_plugin_onHotUpdate = ${onHotUpdate.toString()}
+                let fns = onHotUpdate.toString();
+                if (!fns.startsWith('function ')) fns = 'function ' + fns;
+                result += `<script vite=ignore>var _vite_plugin_onHotUpdate = ${fns}
                 </script>`;
             }
             return html + result;
