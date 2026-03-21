@@ -98,7 +98,7 @@ export function vitePluginNoRefreshHtml(options = {}) {
                     const uu = new URL(module.url, "http://127.0.0.1");
                     const url2 = uu.pathname;
 
-                    if (uu.searchParams.get("_vite_plugin_no-refresh_html_ver") != null) return;
+                    if (uu.searchParams.get("_vite_plugin_no_refresh_html_ver") != null) return;
 
                     console.debug(`>> [no-refresh-html] ${ctx.timestamp} hotUpdate pathname ${module.url}`);
                     ctx.server.ws.send({
@@ -165,7 +165,7 @@ if (import.meta.hot) {
         });
         mjs.forEach((url) => {
             const uu = new URL(url, "http://127.0.0.1");
-            uu.searchParams.set("_vite_plugin_no-refresh_html_ver", tt);
+            uu.searchParams.set("_vite_plugin_no_refresh_html_ver", tt);
             const url2 = uu.pathname + uu.search;
 
             const ss = document.createElement("script");
