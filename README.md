@@ -1,23 +1,21 @@
-# vite-plugin-ncnh
+# vite-plugin-no-refresh-html
 
-**NCNH** = **N**omodulejs **C**hange **N**o **H**ot-refresh (HTML)
-
-A Vite development server plugin that hot-updates JS files referenced by `<script>` tags without `type=module` attribute, while keeping the HTML page itself from refreshing when unchanged, preserving user data such as form inputs.
+A Vite development server plugin that hot-updates JS files (both ESM modules and classic scripts) without refreshing the HTML page, preserving user data such as form inputs.
 
 ## Features
 
-- 🔥 Hot update JS files referenced by `<script>` tags
+- 🔥 Hot update JS files referenced by `<script>` tags (with or without `type="module"`)
 - 💾 Keep HTML page from refreshing when unchanged (preserves form input values)
 - 🍞 Built-in Toast notification component (optional)
 
 ## Installation
 
 ```bash
-npm install -D vite-plugin-nomodulejs-change-norefresh-html
+npm install -D vite-plugin-no-refresh-html
 # or
-pnpm add -D vite-plugin-nomodulejs-change-norefresh-html
+pnpm add -D vite-plugin-no-refresh-html
 # or
-yarn add -D vite-plugin-nomodulejs-change-norefresh-html
+yarn add -D vite-plugin-no-refresh-html
 ```
 
 ## Usage
@@ -26,11 +24,11 @@ Add the plugin in `vite.config.ts` or `vite.config.js`:
 
 ```js
 import { defineConfig } from 'vite'
-import { vitePluginNCNH } from 'vite-plugin-nomodulejs-change-norefresh-html'
+import { vitePluginNoRefreshHtml } from 'vite-plugin-no-refresh-html'
 
 export default defineConfig({
   plugins: [
-    vitePluginNCNH({
+    vitePluginNoRefreshHtml({
       injectToast: true  // Whether to inject Toast component, default true
     })
   ]
@@ -48,11 +46,11 @@ export default defineConfig({
 
 ```js
 import { defineConfig } from 'vite'
-import { vitePluginNCNH } from 'vite-plugin-nomodulejs-change-norefresh-html'
+import { vitePluginNoRefreshHtml } from 'vite-plugin-no-refresh-html'
 
 export default defineConfig({
   plugins: [
-    vitePluginNCNH({
+    vitePluginNoRefreshHtml({
       injectToast: true,
       // This function is serialized and injected into the browser
       onHotUpdate(ctx) {
@@ -70,7 +68,7 @@ export default defineConfig({
 ## How It Works
 
 1. Plugin intercepts Vite's HMR update requests
-2. For changes to JS files referenced by `<script nomodule>`, no page refresh is triggered
+2. For changes to JS files (both ESM modules and classic scripts), no page refresh is triggered
 3. Dynamically creates new `<script>` tags to reload the changed JS files
 4. Optionally displays Toast notifications to inform users
 
@@ -132,8 +130,8 @@ npm run test
 ## File Structure
 
 ```
-vite-plugin-nomodulejs-change-norefresh-html/
-├── vite-plugin-ncnh.js    # Plugin main file
+vite-plugin-no-refresh-html/
+├── vite-plugin-no-refresh-html.js    # Plugin main file
 ├── public/
 │   ├── toast.js           # Toast component JS
 │   └── toast.css          # Toast component styles
@@ -167,7 +165,7 @@ Open browser to http://localhost:5173, then:
 
 - This plugin only works in Vite development server (`vite serve`) mode
 - Production builds do not include this plugin's logic
-- Toast component is served via `/@vite-plugin-ncnh/` path with ETag caching mechanism
+- Toast component is served via `/@vite-plugin-no-refresh-html/` path with ETag caching mechanism
 
 ## License
 

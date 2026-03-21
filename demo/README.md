@@ -1,6 +1,6 @@
-# vite-plugin-ncnh Demo
+# vite-plugin-no-refresh-html Demo
 
-This is the demo project for the vite-plugin-ncnh plugin.
+This is the demo project for the vite-plugin-no-refresh-html plugin.
 
 ## Quick Start
 
@@ -32,11 +32,11 @@ pnpm dev
 Edit `vite.config.ts` to modify plugin options:
 
 ```js
-import { vitePluginNCNH } from '../vite-plugin-ncnh.js'
+import { vitePluginNoRefreshHtml } from '../vite-plugin-no-refresh-html.js'
 
 export default defineConfig({
     plugins: [
-        vitePluginNCNH({
+        vitePluginNoRefreshHtml({
             injectToast: true  // Whether to inject Toast component
         }),
     ],

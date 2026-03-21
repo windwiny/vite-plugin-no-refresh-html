@@ -1,23 +1,21 @@
-# vite-plugin-ncnh
+# vite-plugin-no-refresh-html
 
-**NCNH** = **N**omodulejs **C**hange **N**o **H**ot-refresh (HTML)
-
-一个 Vite 开发服务器插件，用于在开发环境中热更新 `<script>` 标签不带`type=module`属性引用的 JS 文件，同时保持 HTML 页面本身未变化情况下不刷新，保留表单输入等用户数据。
+一个 Vite 开发服务器插件，用于在开发环境中热更新 JS 文件（包括 ESM 模块和经典脚本），同时保持 HTML 页面本身不刷新，保留表单输入等用户数据。
 
 ## 特性
 
-- 🔥 热更新 `<script>` 引用的 JS 文件
-- 💾 保持 HTML 页面本身未变化情况下不刷新，不刷新（保留表单输入值）
+- 🔥 热更新 `<script>` 引用的 JS 文件（带或不带 `type="module"`）
+- 💾 保持 HTML 页面不刷新（保留表单输入值）
 - 🍞 内置 Toast 提示组件（可选）
 
 ## 安装
 
 ```bash
-npm install -D vite-plugin-nomodulejs-change-norefresh-html
+npm install -D vite-plugin-no-refresh-html
 # 或
-pnpm add -D vite-plugin-nomodulejs-change-norefresh-html
+pnpm add -D vite-plugin-no-refresh-html
 # 或
-yarn add -D vite-plugin-nomodulejs-change-norefresh-html
+yarn add -D vite-plugin-no-refresh-html
 ```
 
 ## 使用
@@ -26,11 +24,11 @@ yarn add -D vite-plugin-nomodulejs-change-norefresh-html
 
 ```js
 import { defineConfig } from 'vite'
-import { vitePluginNCNH } from 'vite-plugin-nomodulejs-change-norefresh-html'
+import { vitePluginNoRefreshHtml } from 'vite-plugin-no-refresh-html'
 
 export default defineConfig({
   plugins: [
-    vitePluginNCNH({
+    vitePluginNoRefreshHtml({
       injectToast: true  // 是否注入 Toast 组件，默认 true
     })
   ]
@@ -48,11 +46,11 @@ export default defineConfig({
 
 ```js
 import { defineConfig } from 'vite'
-import { vitePluginNCNH } from 'vite-plugin-nomodulejs-change-norefresh-html'
+import { vitePluginNoRefreshHtml } from 'vite-plugin-no-refresh-html'
 
 export default defineConfig({
   plugins: [
-    vitePluginNCNH({
+    vitePluginNoRefreshHtml({
       injectToast: true,
       // 此函数会被序列化并注入到浏览器中
       onHotUpdate(ctx) {
@@ -70,7 +68,7 @@ export default defineConfig({
 ## 工作原理
 
 1. 插件拦截 Vite 的 HMR 更新请求
-2. 对于 `<script nomodule>` 引用的 JS 文件变更，不触发页面刷新
+2. 对于 JS 文件的变更（包括 ESM 模块和经典脚本），不触发页面刷新
 3. 动态创建新的 `<script>` 标签重新加载变更的 JS 文件
 4. 可选显示 Toast 提示通知用户
 
@@ -132,8 +130,8 @@ npm run test
 ## 文件结构
 
 ```
-vite-plugin-nomodulejs-change-norefresh-html/
-├── vite-plugin-ncnh.js    # 插件主文件
+vite-plugin-no-refresh-html/
+├── vite-plugin-no-refresh-html.js    # 插件主文件
 ├── public/
 │   ├── toast.js           # Toast 组件 JS
 │   └── toast.css          # Toast 组件样式
@@ -167,7 +165,7 @@ pnpm dev
 
 - 此插件仅在 Vite 开发服务器 (`vite serve`) 模式下生效
 - 生产构建不会包含此插件的逻辑
-- Toast 组件通过 `/@vite-plugin-ncnh/` 路径提供，使用 ETag 缓存机制
+- Toast 组件通过 `/@vite-plugin-no-refresh-html/` 路径提供，使用 ETag 缓存机制
 
 ## 许可证
 

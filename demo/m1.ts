@@ -9,4 +9,4 @@ export function modfunc1(s: string) {
 }
 
 window.modfunc1 = modfunc1
-console.log('m1.ts exports:', typeof modfunc1)
+console.log('m1.ts exports modfunc1:', typeof modfunc1)

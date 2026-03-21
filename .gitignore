@@ -112,3 +112,6 @@ build/
 # Test files
 test-results/
 playwright-report/
+/pnpm-workspace.yaml
+/pnpm-lock.yaml
+/tmp-*

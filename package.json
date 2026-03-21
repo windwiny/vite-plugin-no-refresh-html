@@ -1,21 +1,21 @@
 {
-  "name": "vite-plugin-nomodulejs-change-norefresh-html",
-  "version": "1.0.0-rc.3",
-  "description": "Vite plugin for handling nomodule js change not reload html use hmr",
+  "name": "vite-plugin-no-refresh-html",
+  "version": "1.0.2",
+  "description": "Vite plugin that hot-updates JS files without refreshing the HTML page, preserving user inputs",
   "type": "module",
-  "main": "vite-plugin-ncnh.js",
+  "main": "vite-plugin-no-refresh-html.js",
   "exports": {
     ".": {
-      "import": "./vite-plugin-ncnh.js",
-      "require": "./vite-plugin-ncnh.js"
+      "import": "./vite-plugin-no-refresh-html.js",
+      "require": "./vite-plugin-no-refresh-html.js"
     }
   },
   "files": [
-    "vite-plugin-ncnh.js",
+    "README.md",
+    "README_zh.md",
     "public/toast.js",
     "public/toast.css",
-    "README.md",
-    "README_zh.md"
+    "vite-plugin-no-refresh-html.js"
   ],
   "scripts": {
     "prepublishOnly": "npm run test",
@@ -27,23 +27,28 @@
     "publish:latest": "npm publish --access public",
     "publish:next": "npm publish --tag next --access public"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "keywords": [
     "vite",
     "vite-plugin",
-    "script nomodule",
-    "hmr update nomodule js",
-    "keep html inputs value"
+    "hmr javascript",
+    "no refresh html",
+    "preserve input",
+    "script nomodule"
   ],
   "author": "windwiny",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/windwiny/vite-plugin-nomodulejs-change-norefresh-html.git"
+    "url": "git+https://github.com/windwiny/vite-plugin-no-refresh-html.git"
   },
   "bugs": {
-    "url": "https://github.com/windwiny/vite-plugin-nomodulejs-change-norefresh-html/issues"
+    "url": "https://github.com/windwiny/vite-plugin-no-refresh-html/issues"
   },
-  "homepage": "https://github.com/windwiny/vite-plugin-nomodulejs-change-norefresh-html#readme",
+  "homepage": "https://github.com/windwiny/vite-plugin-no-refresh-html#readme",
   "peerDependencies": {
     "vite": "^8.0.1"
   },

@@ -1,12 +1,12 @@
 import { defineConfig } from 'vite'
-import { vitePluginNCNH } from '../vite-plugin-ncnh.js'
+import { vitePluginNoRefreshHtml } from '../vite-plugin-no-refresh-html.js'
 
 export default defineConfig({
     plugins: [
-        vitePluginNCNH({
+        vitePluginNoRefreshHtml({
             injectToast: true,
             onHotUpdate: (data) => {
-                console.log('Hot update:', data);
+                console.log('[demo] Hot update:', data);
                 const hist = document.getElementById('hist');
                 if (hist)
                     hist.innerHTML += '<br>' + JSON.stringify(data,undefined,2);

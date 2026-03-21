@@ -1,5 +1,5 @@
-// demo/5.ts - Test hot update for TS files
-console.log('5.ts loaded')
+// demo/4.ts - Test hot update for TS files
+console.log('4.ts loaded 4')
 
 function func4(msg: string) {
     const msg2 = '4.ts: func4  msg len: ' + msg.length
