@@ -41,6 +41,7 @@ export default defineConfig({
 |------|------|--------|------|
 | `injectToast` | `boolean` | `true` | 是否在 HTML 中自动注入 Toast 组件的 CSS 和 JS |
 | `onHotUpdate` | `function` | `undefined` | 模块热更新后在**浏览器端**执行的回调函数（接收数据对象 `{ gjs, mjs, timestamp }`） |
+| `onHotUpdateDelay` | `number` | `500` | 模块热更新后延迟执行回调函数的时间（毫秒） |
 
 ### onHotUpdate 回调示例
 
@@ -52,12 +53,14 @@ export default defineConfig({
   plugins: [
     vitePluginNoRefreshHtml({
       injectToast: true,
-      // 此函数会被序列化并注入到浏览器中
+      // 此函数会被序列化并注入到浏览器中执行，用于下载后客户端验证
       onHotUpdate(ctx) {
         console.log('热更新:', ctx.gjs, ctx.mjs)
         console.log('时间戳:', ctx.timestamp)
         // 热更新后的自定义逻辑（在浏览器中运行）
-      }
+        // window.file1_version?.verify()
+      },
+      onHotUpdateDelay: 500, // 500ms 延迟执行回调函数，等待 JS 重新下载完成
     })
   ]
 })

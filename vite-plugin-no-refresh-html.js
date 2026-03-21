@@ -19,13 +19,13 @@ import { fileURLToPath } from "url";
  * @return {import('vite').Plugin}
  */
 export function vitePluginNoRefreshHtml(options = {}) {
-    const { injectToast = true, onHotUpdate } = options;
-    const hookPath = "/@vite-plugin-no-refresh-html/client-html-hook.js";
+    const { injectToast = true, onHotUpdate, onHotUpdateDelay = 500 } = options;
+    const hookPath = "/@vite-plugin-no-refresh-html@/client-html-hook.js";  // not same as assetPath
     const vhookPath = "\0" + hookPath;
 
     // Get plugin directory path (supports npm package installation scenario)
     const __dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), 'public');
-    const otherPath = "/@vite-plugin-no-refresh-html/"
+    const assetPath = "/@vite-plugin-no-refresh-html/"
 
     return {
         name: "vite-plugin-no-refresh-html",
@@ -33,7 +33,7 @@ export function vitePluginNoRefreshHtml(options = {}) {
 
         configureServer(server) {
             server.middlewares.use(
-                createAssetMiddleware(__dirname, otherPath)
+                createAssetMiddleware(__dirname, assetPath)
             );
         },
 
@@ -53,8 +53,8 @@ export function vitePluginNoRefreshHtml(options = {}) {
             console.debug(`[no-refresh-html] transformIndexHtml add hook ${ctx.originalUrl}`);
             let result = `\n<script type="module" src="${hookPath}" vite=ignore></script>`;
             if (injectToast) {
-                result += `\n<link rel="stylesheet" href="${otherPath}toast.css" vite=ignore>
-                <script src="${otherPath}toast.js" vite=ignore></script>`;
+                result += `\n<link rel="stylesheet" href="${assetPath}toast.css" vite=ignore>
+                <script src="${assetPath}toast.js" vite=ignore></script>`;
             }
             if (onHotUpdate && typeof onHotUpdate === 'function') {
                 let fnstr = onHotUpdate.toString();
@@ -72,14 +72,20 @@ export function vitePluginNoRefreshHtml(options = {}) {
                 */
                 if (!fnstr.match(/^function\W/)) {
                     try {
-                        eval(fnstr);
+                        // @ts-ignore
+                        new Function(fnstr);
                         // ok then style:2
                     } catch (error) {
                         // style:0
                         fnstr = 'function ' + fnstr;
                     }
                 }
-                result += `\n<script vite=ignore>\n  var _vite_plugin_onHotUpdate = ${fnstr}
+                result += `\n<script vite=ignore>
+                  var _vite_plugin_onHotUpdateDelay = ${onHotUpdateDelay}
+                  if (typeof _vite_plugin_onHotUpdateDelay === 'number') {
+                    _vite_plugin_onHotUpdateDelay = 500;
+                  }
+                  var _vite_plugin_onHotUpdate = ${fnstr}
                 </script>`;
             }
             return html + result;
@@ -174,11 +180,13 @@ if (import.meta.hot) {
             NORH[url + "_m"]++;
         });
         if (window._vite_plugin_onHotUpdate && (gjs.length || mjs.length)) {
-            window._vite_plugin_onHotUpdate({
-                gjs: gjs.join(', '),
-                mjs: mjs.join(', '),
-                timestamp: tt,
-            });
+            setTimeout(() => {
+                window._vite_plugin_onHotUpdate({
+                    gjs: gjs.join(', '),
+                    mjs: mjs.join(', '),
+                    timestamp: tt,
+                });
+            }, window._vite_plugin_onHotUpdateDelay);
         }
     });
 

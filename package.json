@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-no-refresh-html",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Vite plugin that hot-updates JS files without refreshing the HTML page, preserving user inputs",
   "type": "module",
   "main": "vite-plugin-no-refresh-html.js",

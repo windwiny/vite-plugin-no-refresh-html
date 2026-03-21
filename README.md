@@ -41,6 +41,8 @@ export default defineConfig({
 |--------|------|---------|-------------|
 | `injectToast` | `boolean` | `true` | Whether to automatically inject Toast component's CSS and JS into HTML |
 | `onHotUpdate` | `function` | `undefined` | Callback executed in **browser** after module hot update (receives data object `{ gjs, mjs, timestamp }`) |
+| `onHotUpdateDelay` | `number` | `500` | Delay in milliseconds to execute the callback after hot update (default 500ms) |
+
 
 ### Example with onHotUpdate Callback
 
@@ -52,12 +54,14 @@ export default defineConfig({
   plugins: [
     vitePluginNoRefreshHtml({
       injectToast: true,
-      // This function is serialized and injected into the browser
+      // This function is serialized and injected into the browser to verify the hot update after download
       onHotUpdate(ctx) {
         console.log('Hot updated:', ctx.gjs, ctx.mjs)
         console.log('Timestamp:', ctx.timestamp)
         // Custom logic after hot update (runs in browser)
-      }
+        // window.file1_version?.()
+      },
+      onHotUpdateDelay: 500, // 500ms delay execution, wait for fetch finish
     })
   ]
 })
