@@ -56,10 +56,30 @@ export function vitePluginNCNH(options = {}) {
                 result += `<link rel="stylesheet" href="${otherPath}toast.css" vite=ignore>
                 <script src="${otherPath}toast.js" vite=ignore></script>`;
             }
-            if (onHotUpdate) {
-                let fns = onHotUpdate.toString();
-                if (!fns.startsWith('function ')) fns = 'function ' + fns;
-                result += `<script vite=ignore>var _vite_plugin_onHotUpdate = ${fns}
+            if (onHotUpdate && typeof onHotUpdate === 'function') {
+                let fnstr = onHotUpdate.toString();
+                /** WARN Function.prototype.toString style
+                ;[
+                  { ff(a) {return a.length} },
+                  { ff: function(a) {return a.length} },
+                  { ff: (a) => {return a.length} },
+                ].forEach((x, i) => {
+                    console.log('style:' + i, typeof x.ff === 'function', x.ff.toString())
+                })
+                style:0 true ff(a) {return a.length}
+                style:1 true function(a) {return a.length}
+                style:2 true (a) => {return a.length}
+                */
+                if (!fnstr.match(/^function\W/)) {
+                    try {
+                        eval(fnstr);
+                        // ok then style:2
+                    } catch (error) {
+                        // style:0
+                        fnstr = 'function ' + fnstr;
+                    }
+                }
+                result += `\n<script vite=ignore>\n  var _vite_plugin_onHotUpdate = ${fnstr}
                 </script>`;
             }
             return html + result;
