@@ -1,6 +1,6 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
 /**
  * @callback OnHotUpdateCallback
@@ -72,7 +72,6 @@ export function vitePluginNoRefreshHtml(options = {}) {
                 */
                 if (!fnstr.match(/^function\W/)) {
                     try {
-                        // @ts-ignore
                         new Function(fnstr);
                         // ok then style:2
                     } catch (error) {
