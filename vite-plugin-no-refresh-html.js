@@ -19,7 +19,7 @@ import { fileURLToPath } from "node:url";
  * @return {import('vite').Plugin}
  */
 export function vitePluginNoRefreshHtml(options = {}) {
-    const { injectToast = true, onHotUpdate, onHotUpdateDelay = 500 } = options;
+    const { injectToast = true, onHotUpdate, onHotUpdateDelay = 500, useOpenerSaveInput = true } = options;
     const hookPath = "/@vite-plugin-no-refresh-html@/client-html-hook.js";  // not same as assetPath
     const vhookPath = "\0" + hookPath;
 
@@ -51,10 +51,13 @@ export function vitePluginNoRefreshHtml(options = {}) {
 
         transformIndexHtml(html, ctx) {
             console.debug(`[no-refresh-html] transformIndexHtml add hook ${ctx.originalUrl}`);
-            let result = `\n<script type="module" src="${hookPath}" vite=ignore></script>`;
+            const result = [`<script type="module" src="${hookPath}" vite=ignore></script>`];
             if (injectToast) {
-                result += `\n<link rel="stylesheet" href="${assetPath}toast.css" vite=ignore>
-                <script src="${assetPath}toast.js" vite=ignore></script>`;
+                result.push(`<link rel="stylesheet" href="${assetPath}toast.css" vite=ignore>
+                <script src="${assetPath}toast.js" vite=ignore></script>`);
+            }
+            if (useOpenerSaveInput) {
+                result.push(`<script src="${assetPath}use_opener_save_input_values.js" vite=ignore></script>`);
             }
             if (onHotUpdate && typeof onHotUpdate === 'function') {
                 let fnstr = onHotUpdate.toString();
@@ -79,15 +82,15 @@ export function vitePluginNoRefreshHtml(options = {}) {
                         fnstr = 'function ' + fnstr;
                     }
                 }
-                result += `\n<script vite=ignore>
+                result.push(`<script vite=ignore>
                   var _vite_plugin_onHotUpdateDelay = ${onHotUpdateDelay}
                   if (typeof _vite_plugin_onHotUpdateDelay === 'number') {
                     _vite_plugin_onHotUpdateDelay = 500;
                   }
                   var _vite_plugin_onHotUpdate = ${fnstr}
-                </script>`;
+                </script>`);
             }
-            return html + result;
+            return html + "\n" + result.join("\n");
         },
 
         hotUpdate(ctx) {

@@ -42,6 +42,7 @@ export default defineConfig({
 | `injectToast` | `boolean` | `true` | Whether to automatically inject Toast component's CSS and JS into HTML |
 | `onHotUpdate` | `function` | `undefined` | Callback executed in **browser** after module hot update (receives data object `{ gjs, mjs, timestamp }`) |
 | `onHotUpdateDelay` | `number` | `500` | Delay in milliseconds to execute the callback after hot update (default 500ms) |
+| `useOpenerSaveInput` | `boolean` | `true` | Whether to inject script that saves/restores input values from opener window (useful for multi-window scenarios) |
 
 
 ### Example with onHotUpdate Callback

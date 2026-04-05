@@ -42,6 +42,7 @@ export default defineConfig({
 | `injectToast` | `boolean` | `true` | 是否在 HTML 中自动注入 Toast 组件的 CSS 和 JS |
 | `onHotUpdate` | `function` | `undefined` | 模块热更新后在**浏览器端**执行的回调函数（接收数据对象 `{ gjs, mjs, timestamp }`） |
 | `onHotUpdateDelay` | `number` | `500` | 模块热更新后延迟执行回调函数的时间（毫秒） |
+| `useOpenerSaveInput` | `boolean` | `true` | 是否注入用于保存/恢复打开者窗口输入值的脚本（适用于多窗口场景） |
 
 ### onHotUpdate 回调示例
 
