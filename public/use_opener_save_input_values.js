@@ -1,4 +1,4 @@
-// use Opener window save input and textarea value
+// use Opener window save input/select/textarea value
 
 function getFromOpener() {
     const op = window.opener;
