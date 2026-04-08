@@ -52,41 +52,41 @@
         var closable = options.closable !== undefined ? options.closable : defaultOptions.closable;
 
         // Create or get container
-        var container = document.getElementById("builtin-toast-container");
+        var container = document.getElementById("builtin-toastx-container");
         if (!container) {
             container = document.createElement("div");
-            container.id = "builtin-toast-container";
-            container.className = "toast-container toast-" + position;
+            container.id = "builtin-toastx-container";
+            container.className = "toastx-container toastx-" + position;
             document.body.appendChild(container);
         }
 
         // Create toast element
         var toast = document.createElement("div");
-        toast.className = "toast toast-" + type;
+        toast.className = "toastx toastx-" + type;
         toast.setAttribute("role", "alert");
 
         // Icon
         var icon = getIcon(type);
         if (icon) {
             var iconSpan = document.createElement("span");
-            iconSpan.className = "toast-icon";
+            iconSpan.className = "toastx-icon";
             iconSpan.textContent = icon;
             toast.appendChild(iconSpan);
         }
 
         // Message content container
         var contentDiv = document.createElement("div");
-        contentDiv.className = "toast-content";
+        contentDiv.className = "toastx-content";
 
         // Message text
         var messageEl = document.createElement("span");
-        messageEl.className = "toast-message";
+        messageEl.className = "toastx-message";
         messageEl.textContent = message;
         contentDiv.appendChild(messageEl);
 
         // Timestamp
         var timestampEl = document.createElement("span");
-        timestampEl.className = "toast-timestamp";
+        timestampEl.className = "toastx-timestamp";
         timestampEl.textContent = new Date().toLocaleString();
         contentDiv.appendChild(timestampEl);
 
@@ -95,7 +95,7 @@
         // Close button
         if (closable) {
             var closeBtn = document.createElement("button");
-            closeBtn.className = "toast-close";
+            closeBtn.className = "toastx-close";
             closeBtn.innerHTML = "&times;";
             closeBtn.setAttribute("aria-label", "Close");
             closeBtn.addEventListener("click", function () {
@@ -109,7 +109,7 @@
 
         // Animation: enter
         requestAnimationFrame(function () {
-            toast.classList.add("toast-show");
+            toast.classList.add("toastx-show");
         });
 
         // Auto-close timer
@@ -145,15 +145,15 @@
     }
 
     function removeToast(toast) {
-        toast.classList.remove("toast-show");
-        toast.classList.add("toast-hide");
+        toast.classList.remove("toastx-show");
+        toast.classList.add("toastx-hide");
 
         // Wait for close animation to complete before removing
         var onAnimationEnd = function () {
             toast.removeEventListener("transitionend", onAnimationEnd);
             toast.remove();
             // Remove container when empty
-            var container = document.getElementById("builtin-toast-container");
+            var container = document.getElementById("builtin-toastx-container");
             if (container && !container.children.length) {
                 container.remove();
             }
@@ -165,7 +165,7 @@
         setTimeout(function () {
             if (toast.parentElement) {
                 toast.remove();
-                var container = document.getElementById("builtin-toast-container");
+                var container = document.getElementById("builtin-toastx-container");
                 if (container && !container.children.length) {
                     container.remove();
                 }
