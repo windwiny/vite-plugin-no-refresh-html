@@ -51,13 +51,13 @@ export function vitePluginNoRefreshHtml(options = {}) {
 
         transformIndexHtml(html, ctx) {
             console.debug(`[no-refresh-html] transformIndexHtml add hook ${ctx.originalUrl}`);
-            const result = [`<script type="module" src="${hookPath}" vite=ignore></script>`];
+            const result = [`<script type="module" src="${hookPath}"></script>`];
             if (injectToast) {
-                result.push(`<link rel="stylesheet" href="${assetPath}toast.css" vite=ignore>
-                <script src="${assetPath}toast.js" vite=ignore></script>`);
+                result.push(`<link rel="stylesheet" href="${assetPath}toast.css">
+                <script src="${assetPath}toast.js"></script>`);
             }
             if (useOpenerSaveInput) {
-                result.push(`<script src="${assetPath}use_opener_save_input_values.js" vite=ignore></script>`);
+                result.push(`<script src="${assetPath}use_opener_save_input_values.js"></script>`);
             }
             if (onHotUpdate && typeof onHotUpdate === 'function') {
                 let fnstr = onHotUpdate.toString();
@@ -82,7 +82,7 @@ export function vitePluginNoRefreshHtml(options = {}) {
                         fnstr = 'function ' + fnstr;
                     }
                 }
-                result.push(`<script vite=ignore>
+                result.push(`<script>
                   var _vite_plugin_onHotUpdateDelay = ${onHotUpdateDelay}
                   if (typeof _vite_plugin_onHotUpdateDelay === 'number') {
                     _vite_plugin_onHotUpdateDelay = 500;
@@ -155,13 +155,13 @@ if (import.meta.hot) {
 
         let ii = 0;
         gjs.forEach((url) => {
+            const msg = "  js src reload " + url
+            console.debug(msg);
+            window.toast?.success(msg);
             const ss = document.createElement("script");
             ss.src = url;
             ss.id = "_vite_plugin_no_refresh_html_" + tt + "_" + ii++;
             document.body.appendChild(ss);
-            const msg = "  js src reload " + url
-            console.debug(msg);
-            window.toast?.success(msg);
             NORH[url + "_g"] ??= 0;
             NORH[url + "_g"]++;
         });
@@ -169,15 +169,21 @@ if (import.meta.hot) {
             const uu = new URL(url, "http://127.0.0.1");
             uu.searchParams.set("_vite_plugin_no_refresh_html_ver", tt);
             const url2 = uu.pathname + uu.search;
+            if (uu.searchParams.has("html-proxy") && uu.searchParams.has("index")) {
+                // TODO FIXME  skip, script type=module in html vite generated js
+                const msg = "  SKIP " + url
+                console.debug(msg);
+                return;
+            }
+            const msg = "  module js reimport " + url2
+            console.debug(msg);
+            window.toast?.success(msg);
 
             const ss = document.createElement("script");
             ss.type = "module";
             ss.innerHTML = 'import * as xx from "' + url2 + '"';
             ss.id = "_vite_plugin_no_refresh_html_" + tt + "_" + ii++;
             document.body.appendChild(ss);
-            const msg = "  module js reimport " + url2
-            console.debug(msg);
-            window.toast?.success(msg);
             NORH[url + "_m"] ??= 0;
             NORH[url + "_m"]++;
         });
@@ -263,3 +269,5 @@ function createAssetMiddleware(dir, urlPrefix) {
         res.end(content);
     };
 }
+
+export default vitePluginNoRefreshHtml
