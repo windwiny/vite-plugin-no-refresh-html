@@ -1,5 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import * as process from "node:process";
+import * as util from "node:util";
 import { fileURLToPath } from "node:url";
 
 /**
@@ -14,18 +16,41 @@ import { fileURLToPath } from "node:url";
  * @property {OnHotUpdateCallback} [onHotUpdate] - Callback executed after module hot update
  */
 
+export const defaultOptions = {
+    injectToast: true,
+    onHotUpdate: null,
+    onHotUpdateDelay: 500,
+    useOpenerSaveInput: true,
+    excludeHotUpdateHtml: [],
+}
+
 /**
  * @param {VitePluginNoRefreshHtmlOptions} [options]
  * @return {import('vite').Plugin}
  */
-export function vitePluginNoRefreshHtml(options = {}) {
-    const { injectToast = true, onHotUpdate, onHotUpdateDelay = 500, useOpenerSaveInput = true } = options;
+export default function vitePluginNoRefreshHtml(options = {}) {
+    const {
+        injectToast = defaultOptions.injectToast,
+        onHotUpdate = defaultOptions.onHotUpdate,
+        onHotUpdateDelay = defaultOptions.onHotUpdateDelay,
+        useOpenerSaveInput = defaultOptions.useOpenerSaveInput,
+        excludeHotUpdateHtml = defaultOptions.excludeHotUpdateHtml,
+    } = options;
     const hookPath = "/@vite-plugin-no-refresh-html@/client-html-hook.js";  // not same as assetPath
     const vhookPath = "\0" + hookPath;
 
     // Get plugin directory path (supports npm package installation scenario)
     const __dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), 'public');
     const assetPath = "/@vite-plugin-no-refresh-html/"
+
+    const opts = {
+        injectToast,
+        onHotUpdate,
+        onHotUpdateDelay,
+        useOpenerSaveInput,
+        excludeHotUpdateHtml,
+    }
+    console.debug(`[no-refresh-html] ${util.styleText('yellow', 'cfg')}`, JSON.stringify(opts, undefined, 2));
 
     return {
         name: "vite-plugin-no-refresh-html",
@@ -35,6 +60,59 @@ export function vitePluginNoRefreshHtml(options = {}) {
             server.middlewares.use(
                 createAssetMiddleware(__dirname, assetPath)
             );
+
+            if (excludeHotUpdateHtml.length) {
+                server.watcher.on('change', (file2) => {
+                    if (!file2.match(/\.html?$/i)) return
+                    const file = file2.replace(/\\/g, '/');
+                    const basefn = file.split('/').pop();
+
+                    const ex = excludeHotUpdateHtml.some((exItem) => {
+                        // TODO FIXME tips: word capital, and must use / , not \\
+                        if (typeof exItem == 'string' && exItem) {
+                            if (exItem.includes('/')) {
+                                if (exItem[0] != '/' && !exItem.includes(':')) {
+                                    // dir1/name1.html
+                                    exItem = '/' + exItem;
+                                }
+
+                                // /dir1/name1.html or c:/dir1/name1.html
+                                if (file.endsWith(exItem)) {
+                                    return true;
+                                }
+                            } else if (basefn == exItem) {
+                                // name1.html
+                                return true;
+                            }
+                        } else if (exItem instanceof RegExp) {
+                            // /ab*.html/
+                            if (file.match(exItem)) {
+                                return true;
+                            }
+                        }
+                    })
+
+                    if (ex) {
+                        server.__ignoreHtmlReload = true
+                        console.debug(`${new Date().toLocaleTimeString()} >> [no-refresh-html] ${util.styleText('yellow', ' will ignore')} ${path.relative(process.cwd(), file2)}`);
+                    } else {
+                        server.__ignoreHtmlReload = false
+                    }
+                })
+
+                server.ws.on('connection', () => {
+                    const send = server.ws.send
+                    server.ws.send = function (...args) {
+                        const payload = args[0]
+                        if (payload?.type === 'full-reload' && server.__ignoreHtmlReload) {
+                            console.debug(`${new Date().toLocaleTimeString()} [no-refresh-html] ${util.styleText('yellow', ' __ignoreHtmlReload')} `, payload);
+                            server.__ignoreHtmlReload = false // reset
+                            return // skip html refresh
+                        }
+                        return send.apply(this, args)
+                    }
+                })
+            }
         },
 
         resolveId(source) {
@@ -50,15 +128,7 @@ export function vitePluginNoRefreshHtml(options = {}) {
         },
 
         transformIndexHtml(html, ctx) {
-            console.debug(`[no-refresh-html] transformIndexHtml add hook ${ctx.originalUrl}`);
-            const result = [`<script type="module" src="${hookPath}"></script>`];
-            if (injectToast) {
-                result.push(`<link rel="stylesheet" href="${assetPath}toast.css">
-                <script src="${assetPath}toast.js"></script>`);
-            }
-            if (useOpenerSaveInput) {
-                result.push(`<script src="${assetPath}use_opener_save_input_values.js"></script>`);
-            }
+            const result = [];
             if (onHotUpdate && typeof onHotUpdate === 'function') {
                 let fnstr = onHotUpdate.toString();
                 /** WARN Function.prototype.toString style
@@ -90,19 +160,35 @@ export function vitePluginNoRefreshHtml(options = {}) {
                   var _vite_plugin_onHotUpdate = ${fnstr}
                 </script>`);
             }
-            return html + "\n" + result.join("\n");
+
+            result.push(`<script type="module" src="${hookPath}"></script>`)
+
+            if (injectToast) {
+                result.push(`<link rel="stylesheet" href="${assetPath}toast.css">
+                <script src="${assetPath}toast.js"></script>`);
+            }
+            if (useOpenerSaveInput) {
+                result.push(`<script src="${assetPath}use_opener_save_input_values.js"></script>`);
+            }
+
+            const suffHook = result.length ? ("\n" + result.join("\n")) : "";
+            console.debug(`${new Date().toLocaleTimeString()} [no-refresh-html]  transformIndexHtml add hook to ${ctx.originalUrl}, ${html.length}+${suffHook.length}=${html.length + suffHook.length} bytes`);
+            return html + suffHook;
         },
 
         hotUpdate(ctx) {
-            if (ctx.modules.length && ctx.modules[0].environment === "client") {
+            const ctx2 = { file: ctx.file, type: ctx.type, modules: ctx.modules, timestamp: ctx.timestamp }
+            // console.debug(`${new Date().toLocaleTimeString()} [no-refresh-html] hotUpdate  ${ctx.modules.length}`, JSON.stringify(ctx2, undefined, 2));
+            if (ctx.modules.length && ctx.modules[0].environment === "client" && ctx.modules[0].type === 'js') {
+                // proc js module, skip html module
                 ctx.modules.forEach((module) => {
-                    if (module.environment != "client") return;
+                    if (module.environment != "client" || module.type != "js") return;
                     const uu = new URL(module.url, "http://127.0.0.1");
                     const url2 = uu.pathname;
 
                     if (uu.searchParams.get("_vite_plugin_no_refresh_html_ver") != null) return;
 
-                    console.debug(`>> [no-refresh-html] ${ctx.timestamp} hotUpdate pathname ${module.url}`);
+                    console.debug(`${new Date().toLocaleTimeString()} >> [no-refresh-html] ${ctx.timestamp} ${util.styleText('green', ' hotUpdate url')} ${module.url}`);
                     ctx.server.ws.send({
                         event: "no-refresh-html:js",
                         type: "custom",
@@ -252,7 +338,7 @@ function createAssetMiddleware(dir, urlPrefix) {
 
         // Check if client cache is valid
         if (ifNoneMatch === etag) {
-            console.debug(`[no-refresh-html] 304 Not Modified: ${filename}`);
+            console.debug(`${new Date().toLocaleTimeString()} [no-refresh-html]  304 Not Modified: ${filename}`);
             res.statusCode = 304;
             res.end();
             return;
@@ -270,4 +356,4 @@ function createAssetMiddleware(dir, urlPrefix) {
     };
 }
 
-export default vitePluginNoRefreshHtml
+export { vitePluginNoRefreshHtml }

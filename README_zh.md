@@ -42,7 +42,8 @@ export default defineConfig({
 | `injectToast` | `boolean` | `true` | 是否在 HTML 中自动注入 Toast 组件的 CSS 和 JS |
 | `onHotUpdate` | `function` | `undefined` | 模块热更新后在**浏览器端**执行的回调函数（接收数据对象 `{ gjs, mjs, timestamp }`） |
 | `onHotUpdateDelay` | `number` | `500` | 模块热更新后延迟执行回调函数的时间（毫秒） |
-| `useOpenerSaveInput` | `boolean` | `true` | 是否注入用于保存/恢复打开者窗口输入值的脚本（适用于多窗口场景） |
+| `useOpenerSaveInput` | `boolean` | `true` | 配合 `excludeHotUpdateHtml` 选项设置不自动更新的html，用于打开其它窗口，并保存其它窗口发来的输入值 |
+| `excludeHotUpdateHtml` | `Array<string|RegExp>` | `[]` | 排除热更新的 HTML 文件列表（支持文件名或正则表达式） |
 
 ### onHotUpdate 回调示例
 
@@ -137,17 +138,18 @@ npm run test
 vite-plugin-no-refresh-html/
 ├── vite-plugin-no-refresh-html.js    # 插件主文件
 ├── public/
-│   ├── toast.js           # Toast 组件 JS
-│   └── toast.css          # Toast 组件样式
-├── demo/                  # 演示项目目录
-│   ├── index.html         # 演示主页
-│   ├── toast-demo.html    # Toast 演示页面
-│   ├── 1.js, 2.js...      # 测试用的 JS 文件
-│   ├── package.json       # 演示项目的 package.json
-│   └── vite.config.ts     # 演示项目的 Vite 配置
+│   ├── toast.js                            # Toast 组件 JS
+│   ├── toast.css                           # Toast 组件样式
+│   └── use_opener_save_input_values.js     # 用于保存输入值的脚本
+├── demo/                                   # 演示项目目录
+│   ├── test-hotjs.html                     # 演示 hotupdate JS
+│   ├── excl_data.html test-save-input.html # 演示 auto save
+│   ├── toast-demo.html                     # Toast 演示页面
+│   ├── 1.js, 2.js...                       # 测试用的 JS 文件
+│   ├── package.json                        # 演示项目的 package.json
+│   └── vite.config.ts                      # 演示项目的 Vite 配置
 ├── package.json
-├── README.md              # 英文文档
-└── README_zh.md           # 中文文档
+├── README*.md                              # 文档
 ```
 
 ## 演示项目

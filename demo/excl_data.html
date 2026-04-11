@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vite-plugin-no-refresh-html Demo</title>
+    <style>
+        td {
+            padding-left: 5ch;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <ul>
+        <li>
+            <a href="test-save-input.html" onclick="return openx(this);"> test save input</a> <br>
+        </li>
+        <li>
+            <a href="test-hotjs.html" onclick="return openx(this);"> test hot reload js</a> <br>
+        </li>
+        <li></li>
+        <li>
+            <a href="/"> index.html </a> <br>
+        </li>
+    </ul>
+</div>
+<script>
+    function openx(e){
+        if (!e.href) return true;
+        let w = window.open(e.href, '_blank');
+        return false;
+    }
+</script>
+<p>
+  on js or html change, ref `excludeHotUpdateHtml`
+   not auto refresh , for keep data
+</p>
+
+<script src=1.js></script>
+<script type=module src=m1.ts></script>
+
+</body>
+</html>

@@ -1,15 +1,20 @@
 // use Opener window save input/select/textarea value
 
-function getFromOpener() {
+function getFromOpener(url) {
     const op = window.opener;
     if (!op || op === window) {
         return;
     }
 
-    console.debug(` cli getFromOpener url: ${window.location.href}`);
+    if (!url) {
+        url = window.location.href;
+    }
+
+    window._vposi_lastupdate = Date.now();
+    console.debug(` cli getFromOpener url: ${url}`);
     op.postMessage({
         type: "get",
-        url: window.location.href,
+        url: url,
     }, "*");
 }
 
@@ -123,23 +128,42 @@ function restoreInputValues(input_values) {
 }
 
 var _vite_plugin_opener_save_input;
-_vite_plugin_opener_save_input ??= {};
+_vite_plugin_opener_save_input ??= new Map();
 
 window.addEventListener("message", (e) => {
     if (!e.data) {
         return;
     }
 
+    console.debug(`get message`, e);
+
     if (e.data.type === "get") {
-        const input_values = _vite_plugin_opener_save_input[e.data.url] ?? [];
+        let input_values = _vite_plugin_opener_save_input.get(e.source);
+        let ll;
+        if (!input_values) {
+            const ss = Array.from(_vite_plugin_opener_save_input).filter(([k, v]) => k.location.href === e.data.url);
+            if (ss.length >= 1) {
+                ll = ss[0];
+            }
+            if (ss.length > 1) {
+                for (let i = 1; i < ss.length; i++) {
+                    if (ss[i][0]._vposi_lastupdate > ll[0]._vposi_lastupdate) {
+                        ll = ss[i];
+                    }
+                }
+            }
+            if (ll) {
+                input_values = ll[1];
+            }
+        }
         e.source.postMessage({
             type: "return",
-            input_values,
+            input_values: input_values ?? [],
         }, "*");
-        console.debug(` message "get" `, e.data.url, input_values);
+        console.debug(` message "get" `, e.data.url, ll?.[0]?._vposi_lastupdate, input_values);
     } else if (e.data.type === "save") {
         console.debug(` message "save" `, e.data.url, e.data.input_values);
-        _vite_plugin_opener_save_input[e.data.url] = e.data.input_values;
+        _vite_plugin_opener_save_input.set(e.source, e.data.input_values);
     } else if (e.data.type === "return") {
         console.debug(` message "return" `, e.data.input_values);
         restoreInputValues(e.data.input_values);
@@ -149,16 +173,43 @@ window.addEventListener("message", (e) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    const d = document.createElement("div");
-    d.id = "opener_save_input_info";
-    d.style.border = "1px solid red";
-    document.body.insertAdjacentElement("afterbegin", d);
-    setInterval(() => {
-        const t = window.opener ? "OPENER:" + window.opener.location.href : "NOT HAVE OPENER, this page input values cannot auto save and restore"
-        const bg = window.opener ? 'lightyellow' : 'orange'
-        d.title = t;
-        d.style.backgroundColor = bg;
-        d.innerHTML = `:${new Date().getSeconds()} ,    saved pages:[ ${Object.keys(_vite_plugin_opener_save_input).join(",")} ]`
+    const divMsg = document.createElement("div");
+    const divM1 = document.createElement("div");
+    const btnClose = document.createElement("span");
+    btnClose.innerHTML = "X";
+    btnClose.style.float = "right";
+    btnClose.style.cursor = "pointer";
+    btnClose.style.width = "5ch";
+    btnClose.style.textAlign = "center";
+    btnClose.title = "close";
+    btnClose.addEventListener("click", () => {
+        if (int1) clearInterval(int1);
+        divMsg.remove();
+    })
+    divM1.id = "opener_save_input_info";
+    divM1.style.display = "inline-block";
+    divMsg.style.border = "1px solid red";
+    divMsg.appendChild(divM1);
+    divMsg.appendChild(btnClose);
+    document.body.insertAdjacentElement("afterbegin", divMsg);
+
+    var int1 = setInterval(() => {
+        let t1, bg, saved;
+        if (window.opener) {
+            t1 = "opener by \"" + window.opener.location.href + "\"";
+            bg = "lightyellow";
+        } else {
+            t1 = "not opener, this page input values cannot auto save and restore";
+            bg = "darkorange";
+        }
+
+        saved = `<table>${Array.from(_vite_plugin_opener_save_input.keys().map((w) =>
+            `<tr><td>${w.location.href}</td> <td>${new Date(w._vposi_lastupdate ?? 0).toLocaleTimeString()}</td> <td>${w.closed ? 'closed' : 'open'}</td> </tr>`)
+        ).join("")}
+        </table>`
+
+        divMsg.style.backgroundColor = bg;
+        divM1.innerHTML = `:${new Date().getSeconds()} ,  ${t1} ,  saved pages: ${saved}`
     }, 1000)
     getFromOpener();
 });

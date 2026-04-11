@@ -42,7 +42,8 @@ export default defineConfig({
 | `injectToast` | `boolean` | `true` | Whether to automatically inject Toast component's CSS and JS into HTML |
 | `onHotUpdate` | `function` | `undefined` | Callback executed in **browser** after module hot update (receives data object `{ gjs, mjs, timestamp }`) |
 | `onHotUpdateDelay` | `number` | `500` | Delay in milliseconds to execute the callback after hot update (default 500ms) |
-| `useOpenerSaveInput` | `boolean` | `true` | Whether to inject script that saves/restores input values from opener window (useful for multi-window scenarios) |
+| `useOpenerSaveInput` | `boolean` | `true` | combined with `excludeHotUpdateHtml` option , open new window and receive message to saves/restores input values |
+| `excludeHotUpdateHtml` | `Array<string|RegExp>` | `[]` | List of HTML files to exclude from hot update (supports file names or regular expressions) |
 
 
 ### Example with onHotUpdate Callback
@@ -138,17 +139,18 @@ npm run test
 vite-plugin-no-refresh-html/
 ├── vite-plugin-no-refresh-html.js    # Plugin main file
 ├── public/
-│   ├── toast.js           # Toast component JS
-│   └── toast.css          # Toast component styles
-├── demo/                  # Demo project directory
-│   ├── index.html         # Demo main page
-│   ├── toast-demo.html    # Toast demo page
-│   ├── 1.js, 2.js...      # Test JS files
-│   ├── package.json       # Demo project's package.json
-│   └── vite.config.ts     # Demo project's Vite config
+│   ├── toast.js                       # Toast component JS
+│   ├── toast.css                      # Toast component styles
+│   └── use_opener_save_input_values.js # Script for saving input values from opener window
+├── demo/                                      # Demo project directory
+│   ├── test-hotjs.html                        # Demo hotupdate JS
+│   ├── excl_data.html  test-save-input.html   # Demo auto save
+│   ├── toast-demo.html                        # Toast demo page
+│   ├── 1.js, 2.js...                          # Test JS files
+│   ├── package.json                           # Demo project's package.json
+│   └── vite.config.ts                         # Demo project's Vite config
 ├── package.json
-├── README.md              # English documentation
-└── README_zh.md           # Chinese documentation
+├── README*.md                                 # documentation
 ```
 
 ## Demo Project
